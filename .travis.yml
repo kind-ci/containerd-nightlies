@@ -5,6 +5,9 @@ os:
 - linux
 go:
 - 1.12.x
+branches:
+  only:
+  - master
 addons:
   apt:
     packages:
