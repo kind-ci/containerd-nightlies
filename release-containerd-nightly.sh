@@ -46,7 +46,7 @@ apt-get update
 gitUnix="$(git log -1 --pretty='%ct')"
 gitDate="$(date --utc --date "@$gitUnix" +'%Y%m%d%H%M%S')"
 gitCommit="$(git log -1 --pretty='%h')"
-VERSION="v0.0.0-${gitDate}-${gitCommit}"
+VERSION="v1.3.0"
 
 # Create amd64 release
 echo "Creating amd64 release ..."
