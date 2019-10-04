@@ -1,0 +1,43 @@
+dist: bionic
+sudo: required
+language: go
+os:
+- linux
+go:
+- 1.12.x
+branches:
+  only:
+    - master
+addons:
+  apt:
+    packages:
+    - btrfs-tools
+    - libseccomp-dev
+before_install:
+- uname -r
+install:
+- go get -u github.com/containerd/containerd
+- cd $GOPATH/src/github.com/containerd/containerd
+script:
+- export gitUnix="$(git log -1 --pretty='%ct')"
+- export gitDate="$(date --utc --date "@$gitUnix" +'%Y%m%d%H%M%S')"
+- export gitCommit="$(git log -1 --pretty='%h')"
+- export TRAVIS_TAG="v0.0.0-${gitDate}-${gitCommit}"
+- sudo PATH=$PATH GOPATH=$GOPATH $TRAVIS_BUILD_DIR/release-containerd-nightly.sh
+before_deploy:
+- git config --local user.name "Nightly bot"
+- git config --local user.email "nightly.bot@noemail.com"
+- cd $TRAVIS_BUILD_DIR
+- git tag $TRAVIS_TAG
+deploy:
+- provider: releases
+  api_key: 
+    secure: H4hRNaMS6lfgyFOxYBUZY9NA989Et/4blcawIDvwOLuO5i/d+oT2slUwRzhvk4miBwDyMhSMoq4+evC45l+ZqwsK+Wv07UvyYLKXlBMgNUC2T+IIsZzSJhJ+p0JfCPl7xVinoDgCDnA5ZTnDquCUplhjoCLT25gn0vRjGtGLz2gtHHGUuwumrPKQ+qKp2EXaWD8f5SqhHhDzB/B0YFqwS3Ytj4m2G0s91IYQRIp28H8cDwZ/xTorB5Uq0SHQhKgpykFm55QHMO+381Pru0Rt3PXZpt6P7c6xenokJi8UOsAwgfKhnRy/ZRffth731BCOlb4Wop8T7gte5W80qTSImLU8nl8BaF4FgIaKzkf0yWGhHwjApst/2UkDr5RxCQwMDddwDnQpxsfvOWqh1ubGEIejWOcXXSg62T7+gKTc4nDeg7GWhHBOekYQkLsfOye/Ufshw0FMqMFM1JCueKsse3Algl+NvqsqV6/pPZmcT9oumTJPlNmyWrHFakilFmmSt2D6CDII6RKtvFq4ZNI+i9vP8/jkWMNmrEjdoOZxs5pe6XRjm8LkwIWP9Rng73SoS2oBbuy/gao1ItmnmXEmIAhfGN95TFBIKhq01gBqjIxEXU5bG8NPNSNEfXyiZCMw/robWLvgHqGCgwK8sQqElwPx+vsrmWKHt7shCSmrxHQ=
+  file_glob: true
+  file:
+  - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz
+  - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz.sha256sum
+  skip_cleanup: true
+  on:
+    repo: kind-ci/containerd-nightlies
+    tags: true
