@@ -5,9 +5,6 @@ os:
 - linux
 go:
 - 1.12.x
-branches:
-  only:
-    - master
 addons:
   apt:
     packages:
@@ -31,12 +28,12 @@ before_deploy:
 - git tag $TRAVIS_TAG
 deploy:
 - provider: releases
-  api_key: 
-    secure: H4hRNaMS6lfgyFOxYBUZY9NA989Et/4blcawIDvwOLuO5i/d+oT2slUwRzhvk4miBwDyMhSMoq4+evC45l+ZqwsK+Wv07UvyYLKXlBMgNUC2T+IIsZzSJhJ+p0JfCPl7xVinoDgCDnA5ZTnDquCUplhjoCLT25gn0vRjGtGLz2gtHHGUuwumrPKQ+qKp2EXaWD8f5SqhHhDzB/B0YFqwS3Ytj4m2G0s91IYQRIp28H8cDwZ/xTorB5Uq0SHQhKgpykFm55QHMO+381Pru0Rt3PXZpt6P7c6xenokJi8UOsAwgfKhnRy/ZRffth731BCOlb4Wop8T7gte5W80qTSImLU8nl8BaF4FgIaKzkf0yWGhHwjApst/2UkDr5RxCQwMDddwDnQpxsfvOWqh1ubGEIejWOcXXSg62T7+gKTc4nDeg7GWhHBOekYQkLsfOye/Ufshw0FMqMFM1JCueKsse3Algl+NvqsqV6/pPZmcT9oumTJPlNmyWrHFakilFmmSt2D6CDII6RKtvFq4ZNI+i9vP8/jkWMNmrEjdoOZxs5pe6XRjm8LkwIWP9Rng73SoS2oBbuy/gao1ItmnmXEmIAhfGN95TFBIKhq01gBqjIxEXU5bG8NPNSNEfXyiZCMw/robWLvgHqGCgwK8sQqElwPx+vsrmWKHt7shCSmrxHQ=
+  api_key:
+  secure: N4jVRUKgWm3Mi/emfAPNXV1+BxvzxjNMslOThT3m/9c3so6plyKwndtix0/C4cvbNWMHZYhnV6b1hYtHrMrmHP2tGBkoaPfYUQ/c7idLJis6hTz+4I55Am25CP7mSURdjo0p0BfObFnfYq8ePgn0chFK3N8pp/7eMdEsUCHsP9BlB6Lz+Go/HgrMyob8rjPOmgOq5zTu/7NhGug5DN6NXhymIvMUBbhekE2BCsb1EVa7PUyJzfzQ9DyJoKqXyR2aIUjEAudZzhJQLQ/i2pDFrAXIInZ7rz4w310jB4vbNeeYB0W+gV9dzxgOqF1n3Jc34ydfo9SqkjvMtECjX16y5unW8114PvoB4HpBUfMLGQt5xXS0fiPYyCq1yvPDFlCFMhpUwlsqRMOZoFDMXBpHA9gSjdIfvpCKl40i6e2YzKaYPNZ+YU5ImgFbW0rl5n7l5RuFK6vDm/AsHrob7esrPcdv67wHLJCQjrvR/XpK3zsYILzPVucBuj6sBIbNJHUEts7qbAdu4KfR2I5AGwH9obVOWzcadI48fTcQvycVLdiFGUwhBqB/0OiMR2VIGtIQuDTAd11EmFNz6X/C8whsAbAkYcmYhKgkwFVmrawwAsfKEfuqNpJ/RekyGTrr7zKvfXoRDxtF+rolyXxU5ovHlgZPFiv57BdYWGWEsO77C1o=
   file_glob: true
   file:
-  - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz
-  - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz.sha256sum
+  - "$GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz"
+  - "$GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz.sha256sum"
   skip_cleanup: true
   on:
     repo: kind-ci/containerd-nightlies
