@@ -37,10 +37,10 @@ RUNC_DIR=${GOPATH}/src/github.com/opencontainers/runc
 # Add repositories with multiple architectures
 source /etc/os-release
 cat <<EOF > /etc/apt/sources.list
-deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ ${VERSION_CODENAME} main multiverse restricted universe
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ ${VERSION_CODENAME} main multiverse restricted universe
 deb [arch=armhf,arm64,ppc64el,s390x] http://ports.ubuntu.com/ubuntu-ports/ ${VERSION_CODENAME} main multiverse restricted universe
 deb [arch=armhf,arm64,ppc64el,s390x] http://ports.ubuntu.com/ubuntu-ports/ ${VERSION_CODENAME}-updates main multiverse restricted universe
-deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ ${VERSION_CODENAME}-updates main multiverse restricted universe
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ ${VERSION_CODENAME}-updates main multiverse restricted universe
 deb [arch=amd64] http://security.ubuntu.com/ubuntu/ ${VERSION_CODENAME}-security main multiverse restricted universe
 EOF
 
