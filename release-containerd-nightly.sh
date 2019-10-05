@@ -99,7 +99,6 @@ for arch in "${CONTAINERD_ARCH[@]}"; do
     # Create containerd release
     cd ${CONTAINERD_DIR}
     make clean
-    cp ${RUNC_DIR}/runc bin
     LD_LIBRARY_PATH=/usr/lib/${ARCH_PREFIX} \
     make release \
         GOARCH=${arch} \
