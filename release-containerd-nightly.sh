@@ -50,10 +50,7 @@ apt-get update
 echo "Creating amd64 release ..."
 # Name releases using Golang's "pseudo-version"
 cd ${CONTAINERD_DIR}
-gitUnix="$(git log -1 --pretty='%ct')"
-gitDate="$(date --utc --date "@$gitUnix" +'%Y%m%d%H%M%S')"
-gitCommit="$(git log -1 --pretty='%h')"
-VERSION="0.0.0-${gitDate}-${gitCommit}"
+VERSION="1.3.0"
 make release VERSION=${VERSION}
 # We need our own runc for nightlies
 # we use the same version that containerd for consistency
