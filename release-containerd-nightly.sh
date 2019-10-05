@@ -30,6 +30,10 @@ if [ $(go env GOARCH) != "amd64" ]; then
     exit 1
 fi
 
+# Obtain current directory
+CONTAINERD_DIR=${GOPATH}/src/github.com/containerd/containerd
+RUNC_DIR=${GOPATH}/src/github.com/opencontainers/runc
+
 # Add repositories with multiple architectures
 source /etc/os-release
 cat <<EOF > /etc/apt/sources.list
@@ -42,14 +46,19 @@ EOF
 
 apt-get update
 
-# Name release using Golang's "pseudo-version"
+# Create amd64 releases
+echo "Creating amd64 release ..."
+# Name releases using Golang's "pseudo-version"
+cd ${CONTAINERD_DIR}
 gitUnix="$(git log -1 --pretty='%ct')"
 gitDate="$(date --utc --date "@$gitUnix" +'%Y%m%d%H%M%S')"
 gitCommit="$(git log -1 --pretty='%h')"
 VERSION="v0.0.0-${gitDate}-${gitCommit}"
-
-# Create amd64 release
-echo "Creating amd64 release ..."
+make release VERSION=${VERSION}
+# We need our own runc for nightlies
+# we use the same version that containerd for consistency
+# https://github.com/containerd/containerd/blob/master/RUNC.md
+cd ${RUNC_DIR}
 make release VERSION=${VERSION}
 
 # Cross compile for the other architectures
@@ -65,7 +74,6 @@ CONTAINERD_ARCH=(
 rm /usr/local/lib/libseccomp* || true
 
 for arch in "${CONTAINERD_ARCH[@]}"; do
-    make clean
     # Select the right compiler for each architecture
     # and install dependencies
     case ${arch} in
@@ -88,11 +96,21 @@ for arch in "${CONTAINERD_ARCH[@]}"; do
     esac
 
     echo "Creating ${arch} release ..."
+    # Create containerd release
+    cd ${CONTAINERD_DIR}
+    make clean
+    cp ${RUNC_DIR}/runc bin
     LD_LIBRARY_PATH=/usr/lib/${ARCH_PREFIX} \
     make release \
         GOARCH=${arch} \
         CC=${ARCH_PREFIX}-gcc \
         CGO_ENABLED=1 \
         VERSION=${VERSION}
+    # Create runc release
+    cd ${RUNC_DIR}
+    make clean
+    LD_LIBRARY_PATH=/usr/lib/${ARCH_PREFIX} \
+    make release \
+        GOARCH=${arch} \
+        CC=${ARCH_PREFIX}-gcc
 done
-

@@ -17,6 +17,10 @@ before_install:
 - uname -r
 install:
 - go get -u github.com/containerd/containerd
+- export RUNC_COMMIT=$(grep opencontainers/runc ${GOPATH}/src/github.com/containerd/containerd/vendor.conf | cut -d " " -f 2)
+- go get -d github.com/opencontainers/runc
+- cd $GOPATH/src/github.com/opencontainers/runc
+- git checkout $RUNC_COMMIT
 - cd $GOPATH/src/github.com/containerd/containerd
 script:
 - export gitUnix="$(git log -1 --pretty='%ct')"
@@ -37,6 +41,8 @@ deploy:
   file:
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz.sha256sum
+  - $GOPATH/src/github.com/opencontainerd/runc/release/*.tar.gz
+  - $GOPATH/src/github.com/opencontainerd/runc/release/*.tar.gz.sha256sum
   skip_cleanup: true
   on:
     repo: kind-ci/containerd-nightlies
