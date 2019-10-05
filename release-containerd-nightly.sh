@@ -41,7 +41,7 @@ deb [arch=armhf,arm64,ppc64el,s390x] http://ports.ubuntu.com/ubuntu-ports/ ${VER
 deb [arch=armhf,arm64,ppc64el,s390x] http://ports.ubuntu.com/ubuntu-ports/ ${VERSION_CODENAME}-updates main multiverse restricted universe
 EOF
 
-apt-get update
+apt-get update || true
 
 # Create amd64 releases
 echo "Creating amd64 release ..."
