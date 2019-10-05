@@ -53,7 +53,7 @@ cd ${CONTAINERD_DIR}
 gitUnix="$(git log -1 --pretty='%ct')"
 gitDate="$(date --utc --date "@$gitUnix" +'%Y%m%d%H%M%S')"
 gitCommit="$(git log -1 --pretty='%h')"
-VERSION="v0.0.0-${gitDate}-${gitCommit}"
+VERSION="0.0.0-${gitDate}-${gitCommit}"
 make release VERSION=${VERSION}
 # We need our own runc for nightlies
 # we use the same version that containerd for consistency
@@ -112,5 +112,5 @@ for arch in "${CONTAINERD_ARCH[@]}"; do
     make release \
         GOARCH=${arch} \
         CC=${ARCH_PREFIX}-gcc \
-        VERSION=${VERSION}     
+        VERSION=${VERSION}.linux-${arch}
 done
