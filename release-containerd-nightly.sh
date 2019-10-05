@@ -111,5 +111,6 @@ for arch in "${CONTAINERD_ARCH[@]}"; do
     LD_LIBRARY_PATH=/usr/lib/${ARCH_PREFIX} \
     make release \
         GOARCH=${arch} \
-        CC=${ARCH_PREFIX}-gcc
+        CC=${ARCH_PREFIX}-gcc \
+        VERSION=${VERSION}     
 done
