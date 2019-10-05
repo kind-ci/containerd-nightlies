@@ -41,8 +41,7 @@ deploy:
   file:
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz.sha256sum
-  - $GOPATH/src/github.com/opencontainerd/runc/release/*.tar.gz
-  - $GOPATH/src/github.com/opencontainerd/runc/release/*.tar.gz.sha256sum
+  - $GOPATH/src/github.com/containerd/containerd/releases/runc.*
   skip_cleanup: true
   on:
     repo: kind-ci/containerd-nightlies

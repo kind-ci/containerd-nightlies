@@ -60,6 +60,7 @@ make release VERSION=${VERSION}
 # https://github.com/containerd/containerd/blob/master/RUNC.md
 cd ${RUNC_DIR}
 make release VERSION=${VERSION}
+cp release/${VERSION}/runc.${arch} ${CONTAINERD_DIR}/releases/
 
 # Cross compile for the other architectures
 CONTAINERD_ARCH=(
@@ -112,5 +113,6 @@ for arch in "${CONTAINERD_ARCH[@]}"; do
     make release \
         GOARCH=${arch} \
         CC=${ARCH_PREFIX}-gcc \
-        VERSION=${VERSION}.linux-${arch}
+        VERSION=${VERSION}
+    cp release/${VERSION}/runc.${arch} ${CONTAINERD_DIR}/releases/
 done
