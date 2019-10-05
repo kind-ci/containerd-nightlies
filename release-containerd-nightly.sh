@@ -60,7 +60,7 @@ make release VERSION=${VERSION}
 # https://github.com/containerd/containerd/blob/master/RUNC.md
 cd ${RUNC_DIR}
 make release VERSION=${VERSION}
-cp release/${VERSION}/runc.${arch} ${CONTAINERD_DIR}/releases/
+cp release/${VERSION}/runc.amd64 ${CONTAINERD_DIR}/releases/
 
 # Cross compile for the other architectures
 CONTAINERD_ARCH=(
