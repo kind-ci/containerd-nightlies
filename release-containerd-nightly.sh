@@ -26,7 +26,7 @@ install_dependencies() {
 }
 
 # Only runs in x86 architecture
-if [ $(go env GOARCH) != "amd64" ]; then 
+if [ $(go env GOARCH) != "amd64" ]; then
     exit 1
 fi
 
