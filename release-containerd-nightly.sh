@@ -41,23 +41,18 @@ deb [arch=armhf,arm64,ppc64el,s390x] http://ports.ubuntu.com/ubuntu-ports/ ${VER
 deb [arch=armhf,arm64,ppc64el,s390x] http://ports.ubuntu.com/ubuntu-ports/ ${VERSION_CODENAME}-updates main multiverse restricted universe
 EOF
 
+# Don't fail CI updating the mirrors
 apt-get update || true
 
 # Create amd64 releases
 echo "Creating amd64 release ..."
-# Name releases using Golang's "pseudo-version"
-cd ${CONTAINERD_DIR}
-gitUnix="$(git log -1 --pretty='%ct')"
-gitDate="$(date --utc --date "@$gitUnix" +'%Y%m%d%H%M%S')"
-gitCommit="$(git log -1 --pretty='%h')"
-VERSION="0.0.0-${gitDate}-${gitCommit}"
-make release VERSION=${VERSION}
-# We need our own runc for nightlies
-# we use the same version that containerd for consistency
+make release
+# Containerd needs a specific runc version
 # https://github.com/containerd/containerd/blob/master/RUNC.md
 cd ${RUNC_DIR}
-make release VERSION=${VERSION}
-cp release/${VERSION}/runc.amd64 ${CONTAINERD_DIR}/releases/
+RUNC_VERSION=$(cat ./VERSION)
+make release
+cp release/${RUNC_VERSION}/runc.amd64 ${CONTAINERD_DIR}/releases/
 
 # Cross compile for the other architectures
 CONTAINERD_ARCH=(
@@ -101,15 +96,13 @@ for arch in "${CONTAINERD_ARCH[@]}"; do
     make release \
         GOARCH=${arch} \
         CC=${ARCH_PREFIX}-gcc \
-        CGO_ENABLED=1 \
-        VERSION=${VERSION}
+        CGO_ENABLED=1
     # Create runc release
     cd ${RUNC_DIR}
     make clean
     LD_LIBRARY_PATH=/usr/lib/${ARCH_PREFIX} \
     make release \
         GOARCH=${arch} \
-        CC=${ARCH_PREFIX}-gcc \
-        VERSION=${VERSION}
-    cp release/${VERSION}/runc.${arch} ${CONTAINERD_DIR}/releases/
+        CC=${ARCH_PREFIX}-gcc
+    cp release/${RUNC_VERSION}/runc.${arch} ${CONTAINERD_DIR}/releases/
 done
