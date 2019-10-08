@@ -28,10 +28,8 @@ install:
 - git checkout $RUNC_COMMIT
 - cd $GOPATH/src/github.com/containerd/containerd
 script:
-- export gitUnix="$(git log -1 --pretty='%ct')"
-- export gitDate="$(date --utc --date "@$gitUnix" +'%Y%m%d%H%M%S')"
-- export gitCommit="$(git log -1 --pretty='%h')"
-- export TRAVIS_TAG="v0.0.0-${gitDate}-${gitCommit}"
+- export gitVersion="$(git describe --match 'v[0-9]*' --dirty='.m' --always)"
+- export TRAVIS_TAG="containerd-${gitVersion#v}"
 - sudo PATH=$PATH GOPATH=$GOPATH $TRAVIS_BUILD_DIR/release-containerd-nightly.sh
 before_deploy:
 - git config --local user.name "Nightly bot"
@@ -47,7 +45,7 @@ deploy:
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz.sha256sum
   - $GOPATH/src/github.com/containerd/containerd/releases/runc.*
-  name: Build $(date +'%d.%m.%Y %R')
+  name: ${TRAVIS_TAG} Build $(date +'%d.%m.%Y %R')
   skip_cleanup: true
   on:
     repo: kind-ci/containerd-nightlies
