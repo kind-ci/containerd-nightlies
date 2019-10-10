@@ -30,6 +30,7 @@ install:
 script:
 - export gitVersion="$(git describe --match 'v[0-9]*' --dirty='.m' --always)"
 - export TRAVIS_TAG="containerd-${gitVersion#v}"
+- if git rev-parse $TRAVIS_TAG > /dev/null 2>&1 ; then echo "Tag exists, skip the build" ; unset TRAVIS_TAG ; exit 0 ; fi
 - sudo PATH=$PATH GOPATH=$GOPATH $TRAVIS_BUILD_DIR/release-containerd-nightly.sh
 before_deploy:
 - git config --local user.name "Nightly bot"
