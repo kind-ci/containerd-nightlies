@@ -46,6 +46,7 @@ apt-get update || true
 
 # Create amd64 releases
 echo "Creating amd64 release ..."
+cd ${CONTAINERD_DIR}
 make release
 # Containerd needs a specific runc version
 # https://github.com/containerd/containerd/blob/master/RUNC.md
