@@ -3,7 +3,7 @@ matrix:
   - env: CONTAINERD_BRANCH=master
   - env: CONTAINERD_BRANCH=release/1.3
     go: 
-    - 1.12.12
+    - 1.12.13
 dist: bionic
 sudo: required
 language: go
@@ -34,7 +34,8 @@ script:
 - export TRAVIS_TAG="containerd-${gitVersion#v}"
 - echo "${TRAVIS_TAG}"
 - cd $TRAVIS_BUILD_DIR
-- if git rev-parse $TRAVIS_TAG > /dev/null 2>&1 ; then echo "Tag exists, skip the build" ; unset TRAVIS_TAG ; exit 0 ; fi
+- 
+- if curl -sSf "api.github.com/repos/kind-ci/containerd-nightlies/releases/tags/${TRAVIS_TAG}" -o /dev/null; then echo "Release exists, skip the build" ; unset TRAVIS_TAG ; exit 0 ; fi
 - sudo PATH=$PATH GOPATH=$GOPATH $TRAVIS_BUILD_DIR/release-containerd-nightly.sh
 before_deploy:
 - git config --local user.name "Nightly bot"
