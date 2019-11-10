@@ -40,7 +40,8 @@ before_deploy:
 - git config --local user.name "Nightly bot"
 - git config --local user.email "nightly.bot@noemail.com"
 - cd $TRAVIS_BUILD_DIR
-- git tag $TRAVIS_TAG
+- if git rev-parse "${TRAVIS_TAG}"; then echo "Deleting old tag" && git tag -d "${TRAVIS_TAG}"
+- git tag "${TRAVIS_TAG}"
 deploy:
   provider: releases
   api_key:
