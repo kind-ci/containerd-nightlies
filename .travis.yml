@@ -34,7 +34,7 @@ script:
 - export TRAVIS_TAG="containerd-${gitVersion#v}"
 - echo "${TRAVIS_TAG}"
 - cd $TRAVIS_BUILD_DIR
-- if curl -sSf "api.github.com/repos/kind-ci/containerd-nightlies/releases/tags/${TRAVIS_TAG}" -o /dev/null; then echo "Release exists, skip the build" ; unset TRAVIS_TAG ; exit 0 ; fi
+- if curl -sSLf "https://api.github.com/repos/kind-ci/containerd-nightlies/releases/tags/${TRAVIS_TAG}" -o /dev/null; then echo "Release exists, skip the build" ; unset TRAVIS_TAG ; exit 0 ; fi
 - sudo PATH=$PATH GOPATH=$GOPATH $TRAVIS_BUILD_DIR/release-containerd-nightly.sh
 before_deploy:
 - git config --local user.name "Nightly bot"
