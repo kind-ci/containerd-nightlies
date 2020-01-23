@@ -10,7 +10,7 @@ language: go
 os:
 - linux
 go:
-- 1.12.x
+- "1.13.6"
 branches:
   only:
   - master
