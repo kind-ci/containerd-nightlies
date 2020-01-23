@@ -3,7 +3,7 @@ matrix:
   - env: CONTAINERD_BRANCH=master
   - env: CONTAINERD_BRANCH=release/1.3
     go: 
-    - 1.12.13
+    - 1.12.15
 dist: bionic
 sudo: required
 language: go
