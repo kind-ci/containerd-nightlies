@@ -31,7 +31,7 @@ install:
 - git checkout $RUNC_COMMIT
 - cd $GOPATH/src/github.com/containerd/containerd
 script:
-- export gitVersion="$(cd "${GOPATH}/src/github.com/containerd/containerd" && git describe --match 'v[0-9]*' --dirty='.m' --always)+kind-ci"
+- export gitVersion="$(cd "${GOPATH}/src/github.com/containerd/containerd" && git describe --match 'v[0-9]*' --dirty='.m' --always)"
 - export TRAVIS_TAG="containerd-${gitVersion#v}"
 - echo "${TRAVIS_TAG}"
 - cd $TRAVIS_BUILD_DIR
