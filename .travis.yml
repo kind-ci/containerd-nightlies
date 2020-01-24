@@ -47,6 +47,7 @@ deploy:
   provider: releases
   api_key:
     secure: "gjNmomRcwQ00l4Xz8kH7+Q89ixRErJJpI7OvGsxebCFloUpECsUx7a6sJz0WhIGSziyxwxVV618NHCuFyJMZifmiZDZDjz73siJYj8OzKjmnqyxgBeblTYQdi0XtM2p2TpA1FXxC3gMoPHR66oqXi4LoPrQUX3eu8oskvTQd28Z9mgxFkUzF4xSOUkKA+3ppr6tMk8pN4yidkyGAzmnoEsLk37TRKMqaGgnFiHThaJealdG1s7mU9HZCSRkOMAgcfKGCaNp2Gfv6pmH0eluPfCIfrNIM4eQGn35pVqO2EKX2+HApKT07AJuvIDsgG5X2a4odK8428e5KJMxoL40fiSb+HZlbgKDWespy3cDspo/AcG7/QMuhMWzocmty/sefyNk4QCyBkDu5QZCGXJTOUU0zldyV1fb+KKvdAZmiqPdEoVYcAIGA6pQJOh7dnoc3QTHIF3OYWqJ40HPJ9u+pyutP344vZF1ZePnQuvMRg4JCS5hlNceGZ5Fcnxb3OuiMl6rMMFFgifN3w/YCB9dehV0wzhq4YCmuRPtzDAA1TxWh/6mxoayszy+4eBjNoXY7gi7tuPn/6ICBY+vtM7RWDrP3WuPJkNVE8W959nHTG1w+POLqGz7RvCym6ZJyLPsHpFUoH5XgnMhMNogt1RqOyOiuoaFH9/cKtuZxkARyjTM="
+  file_glob: true
   file:
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz.sha256sum
