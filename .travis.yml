@@ -25,12 +25,13 @@ install:
 - mkdir -p "${GOPATH}/src/github.com/containerd/containerd"
 - git clone --branch "${CONTAINERD_BRANCH}" https://github.com/containerd/containerd.git "${GOPATH}/src/github.com/containerd/containerd"
 - export RUNC_COMMIT=$(grep opencontainers/runc ${GOPATH}/src/github.com/containerd/containerd/vendor.conf | cut -d " " -f 2)
+- export RUNC_COMMIT="dc9208a3303feef5b3839f4323d9beb36df0a9dd" # v1.0.0-rc10, TODO: remove this hack
 - go get -d github.com/opencontainers/runc
 - cd $GOPATH/src/github.com/opencontainers/runc
 - git checkout $RUNC_COMMIT
 - cd $GOPATH/src/github.com/containerd/containerd
 script:
-- export gitVersion="$(cd "${GOPATH}/src/github.com/containerd/containerd" && git describe --match 'v[0-9]*' --dirty='.m' --always)"
+- export gitVersion="$(cd "${GOPATH}/src/github.com/containerd/containerd" && git describe --match 'v[0-9]*' --dirty='.m' --always)+kind-ci"
 - export TRAVIS_TAG="containerd-${gitVersion#v}"
 - echo "${TRAVIS_TAG}"
 - cd $TRAVIS_BUILD_DIR
