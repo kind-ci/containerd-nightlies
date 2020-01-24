@@ -38,15 +38,15 @@ script:
 - if curl -sSLf "https://api.github.com/repos/kind-ci/containerd-nightlies/releases/tags/${TRAVIS_TAG}" -o /dev/null; then echo "Release exists, skip the build" ; unset TRAVIS_TAG ; exit 0 ; fi
 - sudo PATH=$PATH GOPATH=$GOPATH $TRAVIS_BUILD_DIR/release-containerd-nightly.sh
 before_deploy:
-- git config --local user.name "Nightly bot"
-- git config --local user.email "nightly.bot@noemail.com"
+- git config --local user.name "kind-ci-robot"
+- git config --local user.email "46937763+kind-ci-robot@users.noreply.github.com"
 - cd $TRAVIS_BUILD_DIR
 - if git rev-parse "${TRAVIS_TAG}"; then echo "Deleting old tag" && git tag -d "${TRAVIS_TAG}"; fi
 - git tag "${TRAVIS_TAG}"
 deploy:
   provider: releases
   api_key:
-    secure: FVfEJ9suf7NCSPKumAaaBJTHjIKJDOg3VsxMLe2tww4wbt7+Af95b25pUOhilzEbOJojvCJldpEQ2hqZQVjW9QSTNfrnrv4EEK2vlGgNY+Stv2R1xsANVc32uJCHsqUonSq2f4f+xGzOuYqbG3LaXoOat6sLNM4tDOQ7BxGsfNebt0JO5sLFZ66Tmvm1AVQYn+EH64uD5OQF0d3hKkLLncpRqOZ5HidDAMVVs6gmoC1g9h9fP3X1sv+JxiKHy19brEpb4QJihy+XVOLx6zkkqSHittnFt1oZ3cbgZkOYvDKW8cNISh3nGEt5td21qPeMIMfGRjwsKYUjujoOsFdIBOONdCIRm0zT52TyZ0Z/DHqycvTblHm9/raTCRpWchoy3et5o4JBK+vWyphBUBRByKD+DxjcLIm12oSEvtDt/or6RMdIciplTE8E84AweDsl+WuN5zgW80aHyjRir+Q58n87EkdE1JsWb1E6WWFH/O1qlGnNcd5TVvk/oolJ1nVJsleqHu+XM4G3lNPRDOkg/vZC6QJFNT4rJtZ2pbDw4WF9s9fY49o6i0hrr6jZ7PAxSkEm+hZRbx2qdoHYvujsmmlIb8vakoRgEwm1+jNpN9dCReIL9HLnwWN6HWDdTNYt/Zh4xzwHoOm/WPsG6A4qiA/kFelOsKpI8qaIeKv04oE=
+    secure: "2/HTS9iOAh6vYJoqVKXlIgR24eeasSsnl8hg2NuPq0aDH9DndpdIBOv0a+n4KZ/XZXIiwXxoYr8v3u8EKbSLG4QS6Zh58Ypi3mWY3dfGCOcxQH007eKVcVSR0CAVdf1JEAYBlQglWLoXMfle+6UgS5kItTEmwbYjvK0V92plKu+QJbV5zzf/sfOz4Fk/GsZ61mJhBG6F2GcG6/uzmJVCPFF+cPkWO0+8e793Y6AjcYnxqBPa8n0gZvhXNzXr8la1D1HPAV9xZEWyUlELeTA3s685eSqOP6S4bkEw+6f+NGTlXBjzlq8Yajt7M87WmnDq3uqJ4aQUMUr5mVFfVQR1owVfEjMssiz3ZSvrG051YLSdno9FGT4Ix56co5gjvCom7GaZELSa5qFGZxwBoa8qOhYz6XRbJerSV2XFz0JZnXIm8YujY3YKsSd1RERcwWINFmOVLOlYKPZJLIjSul2K8gLLwoTu8rysLb1I3JSp5gtolBaf4wVPyXVplFco1/uluGKH8PObb3uRM6ORB8yKKq+BiETxYJmr4JyPPNYxAEOqK23OmWcLu0qwTpmQf8ZD4imm7FcdIWCHYLd+pVHzkzriJ28r1VnsTx+zehWfC5KxC13IUrRPOglr4Wo/SEIsVlm7PxoVaK0VkbfKZOSp8TiV1Dm+UI7Y39XDRzzebUQ="
   file_glob: true
   file:
   - $GOPATH/src/github.com/containerd/containerd/releases/*.tar.gz
