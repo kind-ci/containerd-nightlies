@@ -3,14 +3,14 @@ matrix:
   - env: CONTAINERD_BRANCH=master
   - env: CONTAINERD_BRANCH=release/1.3
     go: 
-    - 1.13.8
+    - 1.13.10
 dist: bionic
 sudo: required
 language: go
 os:
 - linux
 go:
-- 1.13.8
+- 1.13.10
 branches:
   only:
   - master
