@@ -1,7 +1,11 @@
 matrix:
   include:
-  - env: CONTAINERD_BRANCH=master
-  - env: CONTAINERD_BRANCH=release/1.3
+  - env: 
+    - CONTAINERD_BRANCH=master
+    - CONTAINERD_REF=master
+  - env: 
+    - CONTAINERD_BRANCH=release/1.3
+    - CONTAINERD_REF=b26e6abe00d17541647f78c37bbf091cbf797fc3
     go: 
     - 1.13.10
 dist: bionic
@@ -24,6 +28,7 @@ before_install:
 install:
 - mkdir -p "${GOPATH}/src/github.com/containerd/containerd"
 - git clone --branch "${CONTAINERD_BRANCH}" https://github.com/containerd/containerd.git "${GOPATH}/src/github.com/containerd/containerd"
+- (cd "${GOPATH}/src/github.com/containerd/containerd/" && git clone "$CONTAINERD_REF")
 - export RUNC_COMMIT=$(grep opencontainers/runc ${GOPATH}/src/github.com/containerd/containerd/vendor.conf | cut -d " " -f 2)
 - go get -d github.com/opencontainers/runc
 - cd $GOPATH/src/github.com/opencontainers/runc
