@@ -51,7 +51,7 @@ make release
 # Containerd needs a specific runc version
 # https://github.com/containerd/containerd/blob/master/RUNC.md
 cd ${RUNC_DIR}
-RUNC_VERSION=$(cat ./VERSION)
+RUNC_COMMIT=$(grep opencontainers/runc "$GOPATH"/src/github.com/containerd/containerd/vendor.conf | awk '{print $2}')
 make release
 cp release/${RUNC_VERSION}/runc.amd64 ${CONTAINERD_DIR}/releases/
 
