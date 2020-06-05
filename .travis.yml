@@ -5,22 +5,7 @@ matrix:
     - CONTAINERD_REF=master
   - env: 
     - CONTAINERD_BRANCH=release/1.3
-    - CONTAINERD_REF=1e902b2d
-    go: 
-    - 1.13.10
-  - env: 
-    - CONTAINERD_BRANCH=release/1.3
-    - CONTAINERD_REF=b26e6abe
-    go: 
-    - 1.13.10
-  - env: 
-    - CONTAINERD_BRANCH=release/1.3
-    - CONTAINERD_REF=3943a537
-    go: 
-    - 1.13.10
-  - env: 
-    - CONTAINERD_BRANCH=release/1.3
-    - CONTAINERD_REF=v1.3.4
+    - CONTAINERD_REF=release/1.3
     go: 
     - 1.13.10
 dist: bionic
