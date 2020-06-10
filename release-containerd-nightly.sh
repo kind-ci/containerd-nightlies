@@ -102,8 +102,9 @@ for arch in "${CONTAINERD_ARCH[@]}"; do
     cd ${RUNC_DIR}
     make clean
     LD_LIBRARY_PATH=/usr/lib/${ARCH_PREFIX} \
-    make release \
+    make static \
         GOARCH=${arch} \
         CC=${ARCH_PREFIX}-gcc
-    cp release/${RUNC_VERSION}/runc.${arch} ${CONTAINERD_DIR}/releases/
+        BUILDTAGS="seccomp selinux apparmor"
+    mv ./runc ${CONTAINERD_DIR}/releases/runc.${arch}
 done
