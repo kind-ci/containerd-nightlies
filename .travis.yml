@@ -26,15 +26,19 @@ addons:
 before_install:
 - uname -r
 install:
+- GO111MODULE=on go get github.com/mikefarah/yq/v3
 - mkdir -p "${GOPATH}/src/github.com/containerd/containerd"
 - git clone --branch "${CONTAINERD_BRANCH}" https://github.com/containerd/containerd.git "${GOPATH}/src/github.com/containerd/containerd"
 - (cd "${GOPATH}/src/github.com/containerd/containerd/" && git checkout "$CONTAINERD_REF")
+- export GO_VERSION="$(yq r "${GOPATH}/src/github.com/containerd/containerd/.travis.yml" 'go[0]')"
+- eval "$(gimme "${GO_VERSION}")"
 - export RUNC_COMMIT=$(grep opencontainers/runc ${GOPATH}/src/github.com/containerd/containerd/vendor.conf | awk '{print $2}')
 - go get -d github.com/opencontainers/runc
 - cd $GOPATH/src/github.com/opencontainers/runc
 - git checkout $RUNC_COMMIT
 - cd $GOPATH/src/github.com/containerd/containerd
 script:
+- go version
 - export gitVersion="$(cd "${GOPATH}/src/github.com/containerd/containerd" && git describe --match 'v[0-9]*' --dirty='.m' --always)"
 - export TRAVIS_TAG="containerd-${gitVersion#v}"
 - echo "${TRAVIS_TAG}"
