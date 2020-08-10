@@ -30,7 +30,7 @@ install:
 - mkdir -p "${GOPATH}/src/github.com/containerd/containerd"
 - git clone --branch "${CONTAINERD_BRANCH}" https://github.com/containerd/containerd.git "${GOPATH}/src/github.com/containerd/containerd"
 - (cd "${GOPATH}/src/github.com/containerd/containerd/" && git checkout "$CONTAINERD_REF")
-- export GO_VERSION="$(yq r "${GOPATH}/src/github.com/containerd/containerd/travis.yaml" 'go[0]')"
+- export GO_VERSION="$(yq r "${GOPATH}/src/github.com/containerd/containerd/.travis.yaml" 'go[0]')"
 - eval "$(gimme "${GO_VERSION}")"
 - export RUNC_COMMIT=$(grep opencontainers/runc ${GOPATH}/src/github.com/containerd/containerd/vendor.conf | awk '{print $2}')
 - go get -d github.com/opencontainers/runc
