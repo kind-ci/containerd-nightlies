@@ -29,7 +29,6 @@ addons:
 before_install:
 - uname -r
 install:
-- GO111MODULE=on go get github.com/mikefarah/yq/v3
 - mkdir -p "${GOPATH}/src/github.com/containerd/containerd"
 - git clone --branch "${CONTAINERD_BRANCH}" https://github.com/containerd/containerd.git "${GOPATH}/src/github.com/containerd/containerd"
 - (cd "${GOPATH}/src/github.com/containerd/containerd/" && git checkout "$CONTAINERD_REF")
