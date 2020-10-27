@@ -47,7 +47,7 @@ apt-get update || true
 # Create amd64 releases
 echo "Creating amd64 release ..."
 cd ${CONTAINERD_DIR}
-make release
+rm -f bin/
 # Containerd needs a specific runc version
 # https://github.com/containerd/containerd/blob/master/RUNC.md
 cd ${RUNC_DIR}
@@ -92,7 +92,7 @@ for arch in "${CONTAINERD_ARCH[@]}"; do
     echo "Creating ${arch} release ..."
     # Create containerd release
     cd ${CONTAINERD_DIR}
-    make clean
+    rm -f bin/
     LD_LIBRARY_PATH=/usr/lib/${ARCH_PREFIX} \
     make release \
         GOARCH=${arch} \
