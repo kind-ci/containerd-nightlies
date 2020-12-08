@@ -1,0 +1,129 @@
+name: Nigthly
+
+on:
+  schedule:
+    - cron:  '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      ctrversion:
+        description: 'Containerd version'     
+        required: true
+        default: 'master'
+      goversion:
+        description: 'golang version'     
+        required: true
+        default: '1.15.5'
+        
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: src/github.com/containerd/containerd
+
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ github.event.inputs.goversion }}
+          
+    - name: Checkout Containerd
+      uses: actions/checkout@v2
+      with:
+        path: src/github.com/containerd/containerd
+        repository: containerd/containerd
+        ref: ${{ github.event.inputs.ctrversion }}   
+
+    - name: Set env
+      shell: bash
+      run: |
+        echo "GOPATH=${{ github.workspace }}" >> $GITHUB_ENV
+        echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+        echo "VERSION=$(git describe --match 'v[0-9]*' --dirty='.m' --always)" >> $GITHUB_ENV
+      working-directory: src/github.com/containerd/containerd
+
+    - name: Install dependencies
+      run: |
+        sudo add-apt-repository "deb [arch=arm64,s390x,ppc64el] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc) main" || true
+        sudo add-apt-repository "deb [arch=arm64,s390x,ppc64el] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-updates main" || true
+        sudo dpkg --add-architecture arm64
+        sudo dpkg --add-architecture s390x
+        sudo dpkg --add-architecture ppc64el
+        sudo apt-get update || true
+        sudo apt-get install -y \
+          crossbuild-essential-arm64 \
+          crossbuild-essential-s390x \
+          crossbuild-essential-ppc64el \
+          libseccomp-dev:amd64 \
+          libseccomp-dev:arm64 \
+          libseccomp-dev:s390x \
+          libseccomp-dev:ppc64el
+
+    - name: Build amd64
+      env:
+        GOOS: linux
+        GOARCH: amd64
+      run: |
+        make binaries
+        RELEASE=containerd-$(VERSION:v%=%).${GOOS}-${GOARCH}
+        tar -czf ${RELEASE}.tar.gz bin
+        mv bin bin_amd64
+
+    - name: Build arm64
+      env:
+        GOOS: linux
+        GOARCH: arm64
+        CC: aarch64-linux-gnu-gcc
+        CGO_ENABLED: 1
+      run: |
+        make binaries
+        RELEASE=containerd-$(VERSION:v%=%).${GOOS}-${GOARCH}
+        tar -czf ${RELEASE}.tar.gz bin
+        mv bin bin_arm64
+
+    - name: Build s390x
+      env:
+        GOOS: linux
+        GOARCH: s390x
+        CGO_ENABLED: 1
+        CC: s390x-linux-gnu-gcc
+      run: |
+        make binaries
+        RELEASE=containerd-$(VERSION:v%=%).${GOOS}-${GOARCH}
+        tar -czf ${RELEASE}.tar.gz bin
+        mv bin bin_s390x
+
+    - name: Build ppc64le
+      env:
+        GOOS: linux
+        GOARCH: ppc64le
+        CGO_ENABLED: 1
+        CC: powerpc64le-linux-gnu-gcc
+      run: |
+        make binaries
+        RELEASE=containerd-$(VERSION:v%=%).${GOOS}-${GOARCH}
+        tar -czf ${RELEASE}.tar.gz bin
+        mv bin bin_ppc64le
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.VERSION }}
+        release_name: Release ${{ env.VERSION }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      id: upload-release-asset 
+        uses: alexellis/upload-assets@0.2.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        asset_paths: '["./*.tar.gz"]'
+
+        
