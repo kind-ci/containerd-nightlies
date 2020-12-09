@@ -4,16 +4,15 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
-    inputs:
-      ctrversion:
-        description: "Containerd version"
-        required: true
-        default: "master"
 
 jobs:
   linux:
     name: Linux
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        branches: ["release/1.4", "master"]
 
     defaults:
       run:
@@ -25,7 +24,7 @@ jobs:
         with:
           path: src/github.com/containerd/containerd
           repository: containerd/containerd
-          ref: ${{ github.event.inputs.ctrversion }}
+          ref: ${{ matrix.branches }}
 
       - name: Set env
         shell: bash
