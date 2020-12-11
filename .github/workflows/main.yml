@@ -1,0 +1,140 @@
+name: Nigthly
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        branches: ["release/1.4", "master"]
+
+    defaults:
+      run:
+        working-directory: src/github.com/containerd/containerd
+
+    steps:
+      - name: Checkout Containerd
+        uses: actions/checkout@v2
+        with:
+          path: src/github.com/containerd/containerd
+          repository: containerd/containerd
+          ref: ${{ matrix.branches }}
+
+      - name: Set env
+        shell: bash
+        run: |
+          echo "GOPATH=${{ github.workspace }}" >> $GITHUB_ENV
+          echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+          VERSION=$(git describe --match 'v[0-9]*' --dirty='.m' --always)
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          if [ -f go.mod ]; then
+            RUNC_COMMIT=$(grep opencontainers/runc go.mod | awk '{print $2}')
+          else
+            # containerd 1.4 and lower use vendor.conf for the modules
+            RUNC_COMMIT=$(grep opencontainers/runc vendor.conf | awk '{print $2}')
+          fi
+          echo "RUNC_COMMIT=${RUNC_COMMIT}" >> $GITHUB_ENV
+          GO_VERSION=$(grep go_version .zuul/playbooks/containerd-build/run.yaml | grep -Eo [0-9]\.[0-9]+\.[^\']+)
+          echo "GO_VERSION=${GO_VERSION}" >> $GITHUB_ENV
+        working-directory: src/github.com/containerd/containerd
+
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Checkout runc
+        uses: actions/checkout@v2
+        with:
+          path: src/github.com/opencontainers/runc
+          repository: opencontainers/runc
+          ref: ${{ env.RUNC_COMMIT }}
+
+      - name: Install dependencies
+        run: |
+          sudo add-apt-repository "deb [arch=arm64,s390x,ppc64el] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc) main" || true
+          sudo add-apt-repository "deb [arch=arm64,s390x,ppc64el] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-updates main" || true
+          sudo dpkg --add-architecture arm64
+          sudo dpkg --add-architecture s390x
+          sudo dpkg --add-architecture ppc64el
+          sudo apt-get update || true
+          sudo apt-get install -y \
+            crossbuild-essential-arm64 \
+            crossbuild-essential-s390x \
+            crossbuild-essential-ppc64el \
+            libseccomp-dev:amd64 \
+            libseccomp-dev:arm64 \
+            libseccomp-dev:s390x \
+            libseccomp-dev:ppc64el
+
+      - name: Build amd64
+        env:
+          GOOS: linux
+          GOARCH: amd64
+        run: |
+          make release
+          pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
+            make static BUILDTAGS="seccomp selinux apparmor"
+            mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
+          popd
+
+      - name: Build arm64
+        env:
+          GOOS: linux
+          GOARCH: arm64
+          CC: aarch64-linux-gnu-gcc
+          CGO_ENABLED: 1
+        run: |
+          make release
+          pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
+            make static BUILDTAGS="seccomp selinux apparmor"
+            mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
+          popd
+
+      - name: Build s390x
+        env:
+          GOOS: linux
+          GOARCH: s390x
+          CGO_ENABLED: 1
+          CC: s390x-linux-gnu-gcc
+        run: |
+          make release
+          pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
+            make static BUILDTAGS="seccomp selinux apparmor"
+            mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
+          popd
+
+      - name: Build ppc64le
+        env:
+          GOOS: linux
+          GOARCH: ppc64le
+          CGO_ENABLED: 1
+          CC: powerpc64le-linux-gnu-gcc
+        run: |
+          make release
+          pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
+            make static BUILDTAGS="seccomp selinux apparmor"
+            mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
+          popd
+
+      - name: Create Release
+        run: |
+          set -x
+          assets=()
+          for asset in ./releases/*.tar.gz; do
+            assets+=("-a" "$asset")
+          done
+          for asset in ./releases/runc.*; do
+            assets+=("-a" "$asset")
+          done
+          tag_name="containerd-${VERSION#v}"
+          hub release create "${assets[@]}" -m "$tag_name Build $(date +'%d.%m.%Y %R')" "$tag_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: src/github.com/containerd/containerd
