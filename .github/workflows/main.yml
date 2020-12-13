@@ -124,6 +124,11 @@ jobs:
             mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
           popd
 
+      - name: Install github/hub
+        run: |
+          export HUB_VERSION="2.14.1"
+          curl -fsSL https://github.com/github/hub/raw/40e421edd2c63d57bb8daa4bb9bbdfa21e8becf9/script/get | bash -s "${HUB_VERSION}"
+          
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -137,5 +142,5 @@ jobs:
             assets+=("-a" "$asset")
           done
           tag_name="containerd-${VERSION#v}"
-          hub release create "${assets[@]}" -m "$tag_name Build $(date +'%d.%m.%Y %R')" "$tag_name"
+          ./bin/hub release create "${assets[@]}" -m "$tag_name Build $(date +'%d.%m.%Y %R')" "$tag_name"
         working-directory: src/github.com/containerd/containerd
