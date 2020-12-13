@@ -125,6 +125,8 @@ jobs:
           popd
 
       - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -x
           assets=()
@@ -136,6 +138,4 @@ jobs:
           done
           tag_name="containerd-${VERSION#v}"
           hub release create "${assets[@]}" -m "$tag_name Build $(date +'%d.%m.%Y %R')" "$tag_name"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: src/github.com/containerd/containerd
