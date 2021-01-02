@@ -144,6 +144,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -x
+          # wait until the release has been created
+          sleep 10
+          # obtain all the artifacts
           assets=()
           for asset in ./releases/*.tar.gz; do
             assets+=("-a" "$asset")
@@ -151,5 +154,6 @@ jobs:
           for asset in ./releases/runc.*; do
             assets+=("-a" "$asset")
           done
+          # append the artifacts to the release
           hub release edit "${assets[@]}" -m "" $TAG_NAME
         working-directory: src/github.com/containerd/containerd
