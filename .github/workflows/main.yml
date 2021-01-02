@@ -43,6 +43,10 @@ jobs:
           echo "RUNC_COMMIT=${RUNC_COMMIT}" >> $GITHUB_ENV
           GO_VERSION=$(grep go_version .zuul/playbooks/containerd-build/run.yaml | grep -Eo [0-9]\.[0-9]+\.[^\']+)
           echo "GO_VERSION=${GO_VERSION}" >> $GITHUB_ENV
+          TAG_NAME="containerd-${VERSION#v}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+          TAG_DESCRIPTION="$tag_name Build $(date +'%d.%m.%Y %R')"
+          echo "TAG_DESCRIPTION=${TAG_DESCRIPTION}" >> $GITHUB_ENV
         working-directory: src/github.com/containerd/containerd
 
       - name: Set up Go
@@ -124,12 +128,18 @@ jobs:
             mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
           popd
 
-      - name: Install github/hub
-        run: |
-          export HUB_VERSION="2.14.1"
-          curl -fsSL https://github.com/github/hub/raw/40e421edd2c63d57bb8daa4bb9bbdfa21e8becf9/script/get | bash -s "${HUB_VERSION}"
-          
       - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: Release ${{ env.TAG_DESCRIPTION }}
+          draft: false
+          prerelease: false
+          
+      - name: Add assets to the Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -141,6 +151,5 @@ jobs:
           for asset in ./releases/runc.*; do
             assets+=("-a" "$asset")
           done
-          tag_name="containerd-${VERSION#v}"
-          ./bin/hub release create "${assets[@]}" -m "$tag_name Build $(date +'%d.%m.%Y %R')" "$tag_name"
+          hub release edit "${assets[@]}" -m "" $TAG_NAME
         working-directory: src/github.com/containerd/containerd
