@@ -15,10 +15,6 @@ jobs:
       matrix:
         branches: ["release/1.4", "master"]
 
-    defaults:
-      run:
-        working-directory: src/github.com/containerd/containerd
-
     steps:
       - name: Checkout Containerd
         uses: actions/checkout@v2
@@ -47,6 +43,10 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
           TAG_DESCRIPTION="$tag_name Build $(date +'%d.%m.%Y %R')"
           echo "TAG_DESCRIPTION=${TAG_DESCRIPTION}" >> $GITHUB_ENV
+          if curl -sSLf "https://api.github.com/repos/kind-ci/containerd-nightlies/releases/tags/${TAG_NAME}" -o /dev/null; then
+            echo "Release exists, skip the build"
+            exit 0
+          fi
         working-directory: src/github.com/containerd/containerd
 
       - name: Set up Go
@@ -82,6 +82,7 @@ jobs:
         env:
           GOOS: linux
           GOARCH: amd64
+        working-directory: src/github.com/containerd/containerd
         run: |
           make release
           pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
@@ -95,6 +96,7 @@ jobs:
           GOARCH: arm64
           CC: aarch64-linux-gnu-gcc
           CGO_ENABLED: 1
+        working-directory: src/github.com/containerd/containerd
         run: |
           make release
           pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
@@ -108,6 +110,7 @@ jobs:
           GOARCH: s390x
           CGO_ENABLED: 1
           CC: s390x-linux-gnu-gcc
+        working-directory: src/github.com/containerd/containerd
         run: |
           make release
           pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
@@ -121,6 +124,7 @@ jobs:
           GOARCH: ppc64le
           CGO_ENABLED: 1
           CC: powerpc64le-linux-gnu-gcc
+        working-directory: src/github.com/containerd/containerd
         run: |
           make release
           pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
@@ -129,15 +133,13 @@ jobs:
           popd
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          release_name: Release ${{ env.TAG_DESCRIPTION }}
-          draft: false
-          prerelease: false
+        run: |
+          git config --local user.name "kind-ci-robot"
+          git config --local user.email "46937763+kind-ci-robot@users.noreply.github.com"
+          if git rev-parse "${TAG_NAME}"; then 
+            echo "Deleting old tag" && git tag -d "${TAG_NAME}"
+          fi
+          git tag "${TAG_NAME}"
           
       - name: Add assets to the Release
         env:
@@ -155,5 +157,6 @@ jobs:
             assets+=("-a" "$asset")
           done
           # append the artifacts to the release
-          hub release edit "${assets[@]}" -m "" $TAG_NAME
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "Release $TAG_NAME" "$TAG_NAME"
         working-directory: src/github.com/containerd/containerd
