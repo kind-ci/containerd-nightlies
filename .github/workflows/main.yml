@@ -132,6 +132,8 @@ jobs:
             mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
           popd
 
+      - uses: actions/checkout@v2
+    
       - name: Create Release
         run: |
           git config --local user.name "kind-ci-robot"
