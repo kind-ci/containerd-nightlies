@@ -157,18 +157,20 @@ jobs:
       - name: Add assets to the Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: src/github.com/containerd/containerd/releases
         run: |
           set -x
-          # wait until the release has been created
-          sleep 10
+          # add shasum to runc artifacts
+          for asset in ./runc*; do
+            sha256sum $asset > ${asset}.sha256sum
+          done
           # obtain all the artifacts
           assets=()
-          for asset in  ${{ github.workspace }}/src/github.com/containerd/containerd/releases/*.tar.gz; do
-            assets+=("-a" "$asset")
+          for asset in  ./*.tar.gz; do
+            assets+=("-a" "${asset}")
           done
-          for asset in ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.*; do
-            assets+=("-a" "$asset")
+          for asset in ./runc.*; do
+            assets+=("-a" "${asset}")         
           done
           # append the artifacts to the release
-          tag_name="${GITHUB_REF##*/}"
           hub release create "${assets[@]}" -m "Release $TAG_NAME" "$TAG_NAME"
