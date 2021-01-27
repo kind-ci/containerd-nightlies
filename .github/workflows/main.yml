@@ -160,6 +160,10 @@ jobs:
         working-directory: src/github.com/containerd/containerd/releases
         run: |
           set -x
+          pwd
+          find .
+          ls *
+          find ${{ github.workspace }} | grep releases
           # add shasum to runc artifacts
           for asset in ./runc*; do
             sha256sum $asset > ${asset}.sha256sum
