@@ -22,10 +22,11 @@ jobs:
           path: src/github.com/containerd/containerd
           repository: containerd/containerd
           ref: ${{ matrix.branches }}
+          fetch-depth: 0
 
       - name: Set env
-        shell: bash
         run: |
+          set -x
           echo "GOPATH=${{ github.workspace }}" >> $GITHUB_ENV
           echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
           VERSION=$(git describe --match 'v[0-9]*' --dirty='.m' --always)
@@ -60,9 +61,11 @@ jobs:
           path: src/github.com/opencontainers/runc
           repository: opencontainers/runc
           ref: ${{ env.RUNC_COMMIT }}
+          fetch-depth: 0
 
       - name: Install dependencies
         run: |
+          set -x
           sudo add-apt-repository "deb [arch=arm64,s390x,ppc64el] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc) main" || true
           sudo add-apt-repository "deb [arch=arm64,s390x,ppc64el] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-updates main" || true
           sudo dpkg --add-architecture arm64
@@ -84,6 +87,7 @@ jobs:
           GOARCH: amd64
         working-directory: src/github.com/containerd/containerd
         run: |
+          set -x
           make release
           pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
             make static BUILDTAGS="seccomp selinux apparmor"
@@ -98,6 +102,7 @@ jobs:
           CGO_ENABLED: 1
         working-directory: src/github.com/containerd/containerd
         run: |
+          set -x
           make release
           pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
             make static BUILDTAGS="seccomp selinux apparmor"
@@ -112,6 +117,7 @@ jobs:
           CC: s390x-linux-gnu-gcc
         working-directory: src/github.com/containerd/containerd
         run: |
+          set -x
           make release
           pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
             make static BUILDTAGS="seccomp selinux apparmor"
@@ -126,6 +132,7 @@ jobs:
           CC: powerpc64le-linux-gnu-gcc
         working-directory: src/github.com/containerd/containerd
         run: |
+          set -x
           make release
           pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
             make static BUILDTAGS="seccomp selinux apparmor"
@@ -133,9 +140,13 @@ jobs:
           popd
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
     
       - name: Create Release
         run: |
+          set -x
           git config --local user.name "kind-ci-robot"
           git config --local user.email "46937763+kind-ci-robot@users.noreply.github.com"
           if git rev-parse "${TAG_NAME}"; then 
@@ -152,13 +163,12 @@ jobs:
           sleep 10
           # obtain all the artifacts
           assets=()
-          for asset in ./releases/*.tar.gz; do
+          for asset in  ${{ github.workspace }}/src/github.com/containerd/containerd/releases/*.tar.gz; do
             assets+=("-a" "$asset")
           done
-          for asset in ./releases/runc.*; do
+          for asset in ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.*; do
             assets+=("-a" "$asset")
           done
           # append the artifacts to the release
           tag_name="${GITHUB_REF##*/}"
           hub release create "${assets[@]}" -m "Release $TAG_NAME" "$TAG_NAME"
-        working-directory: src/github.com/containerd/containerd
