@@ -16,6 +16,10 @@ jobs:
         branches: ["release/1.4", "master"]
 
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Checkout Containerd
         uses: actions/checkout@v2
         with:
@@ -138,11 +142,7 @@ jobs:
             make static BUILDTAGS="seccomp selinux apparmor"
             mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
           popd
-
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-    
+   
       - name: Create Release
         run: |
           set -x
@@ -159,9 +159,6 @@ jobs:
         working-directory: src/github.com/containerd/containerd
         run: |
           set -x
-          find .
-          ls *
-          find ${{ github.workspace }} | grep releases
           cd releases
           # add shasum to runc artifacts
           for asset in ./runc*; do
