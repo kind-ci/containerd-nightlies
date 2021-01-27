@@ -166,7 +166,7 @@ jobs:
           done
           # obtain all the artifacts
           assets=()
-          for asset in  ./*.tar.gz; do
+          for asset in  ./*.tar.gz*; do
             assets+=("-a" "${asset}")
           done
           for asset in ./runc.*; do
