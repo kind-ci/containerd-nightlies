@@ -144,6 +144,8 @@ jobs:
           popd
    
       - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           set -x
           git config --local user.name "kind-ci-robot"
@@ -153,23 +155,18 @@ jobs:
           fi
           git tag "${TAG_NAME}"
           
-      - name: Add assets to the Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        working-directory: src/github.com/containerd/containerd
-        run: |
-          set -x
-          cd releases
-          # add shasum to runc artifacts
-          for asset in ./runc*; do
-            sha256sum $asset > ${asset}.sha256sum
-          done
+          # add shasum to runc artifacts and copy all artifacts to current workspace
+          pushd ${{ github.workspace }}/src/github.com/containerd/containerd/releases
+            for asset in ./runc*; do
+              sha256sum $asset > ${asset}.sha256sum
+            done
+          popd
           # obtain all the artifacts
           assets=()
-          for asset in  ./*.tar.gz*; do
+          for asset in  ${{ github.workspace }}/src/github.com/containerd/containerd/releases/*.tar.gz*; do
             assets+=("-a" "${asset}")
           done
-          for asset in ./runc.*; do
+          for asset in ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.*; do
             assets+=("-a" "${asset}")         
           done
           # append the artifacts to the release
