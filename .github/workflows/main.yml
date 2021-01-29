@@ -157,7 +157,7 @@ jobs:
           
           # add shasum to runc artifacts and copy all artifacts to current workspace
           pushd ${{ github.workspace }}/src/github.com/containerd/containerd/releases
-            for asset in ./runc*; do
+            for asset in runc*; do
               sha256sum $asset > ${asset}.sha256sum
             done
           popd
