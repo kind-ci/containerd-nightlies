@@ -48,10 +48,6 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
           TAG_DESCRIPTION="$tag_name Build $(date +'%d.%m.%Y %R')"
           echo "TAG_DESCRIPTION=${TAG_DESCRIPTION}" >> $GITHUB_ENV
-          if curl -sSLf "https://api.github.com/repos/kind-ci/containerd-nightlies/releases/tags/${TAG_NAME}" -o /dev/null; then
-            echo "Release exists, skip the build"
-            exit 0
-          fi
         working-directory: src/github.com/containerd/containerd
 
       - name: Set up Go
@@ -169,5 +165,9 @@ jobs:
           for asset in ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.*; do
             assets+=("-a" "${asset}")         
           done
-          # append the artifacts to the release
+          # append the artifacts to the release if does not exist
+          if curl -sSLf "https://api.github.com/repos/kind-ci/containerd-nightlies/releases/tags/${TAG_NAME}" -o /dev/null; then
+            echo "Release exists, skip the build"
+            exit 0
+          fi
           hub release create "${assets[@]}" -m "Release $TAG_NAME" "$TAG_NAME"
