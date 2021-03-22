@@ -80,10 +80,10 @@ jobs:
             libseccomp-dev:arm64 \
             libseccomp-dev:s390x \
             libseccomp-dev:ppc64el \
-            btrfs-progs-devel:amd64 \
-            btrfs-progs-devel:arm64 \
-            btrfs-progs-devel:s390x \
-            btrfs-progs-devel:ppc64el
+            libbtrfs-dev:amd64 \
+            libbtrfs-dev:arm64 \
+            libbtrfs-dev:s390x \
+            libbtrfs-dev:ppc64el
 
       - name: Build amd64
         env:
