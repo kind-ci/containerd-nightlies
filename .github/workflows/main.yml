@@ -1,4 +1,4 @@
-name: Nigthly
+name: Nightly
 
 on:
   schedule:
