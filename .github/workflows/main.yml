@@ -81,6 +81,12 @@ jobs:
             libbtrfs-dev:s390x \
             libbtrfs-dev:ppc64el
 
+      - name: Create runc.VERSION
+        working-directory: src/github.com/containerd/containerd
+        run: |
+          set -x
+          echo "${RUNC_VERSION}" > releases/runc.VERSION
+
       - name: Build amd64
         env:
           GOOS: linux
