@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branches: ["release/1.5", "main"]
+        branches: ["release/1.5", "release/1.6", "main"]
 
     steps:
       - uses: actions/checkout@v2
