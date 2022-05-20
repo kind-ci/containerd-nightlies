@@ -16,12 +16,14 @@ jobs:
         branches: ["release/1.5", "release/1.6", "v1.6.2", "main"]
 
     steps:
-      - uses: actions/checkout@v2
+       # this is v3.0.2 https://github.com/actions/checkout/releases/tag/v3.0.2
+       # TODO: replace actions with just using git directly, for security purposes
+      - uses: actions/checkout@v2541b1294d2704b0964813337f33b291d3f8596b
         with:
           fetch-depth: 0
 
       - name: Checkout Containerd
-        uses: actions/checkout@v2
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
         with:
           path: src/github.com/containerd/containerd
           repository: containerd/containerd
@@ -47,12 +49,13 @@ jobs:
         working-directory: src/github.com/containerd/containerd
 
       - name: Set up Go
-        uses: actions/setup-go@v1
+        # this is v3.1.0
+        uses: actions/setup-go@fcdc43634adb5f7ae75a9d7a9b9361790f7293e2
         with:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Checkout runc
-        uses: actions/checkout@v2
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
         with:
           path: src/github.com/opencontainers/runc
           repository: opencontainers/runc
