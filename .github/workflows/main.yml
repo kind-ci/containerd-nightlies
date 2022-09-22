@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branches: ["release/1.5", "release/1.6", "v1.6.8", "main"]
+        branches: ["release/1.6", "v1.6.8", "main"]
 
     steps:
        # this is v3.0.2 https://github.com/actions/checkout/releases/tag/v3.0.2
