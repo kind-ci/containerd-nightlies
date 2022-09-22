@@ -40,7 +40,7 @@ jobs:
           # script/setup/runc-version was introduced in containerd v1.5.0 / v1.4.5 .
           RUNC_COMMIT=$(cat script/setup/runc-version)
           echo "RUNC_COMMIT=${RUNC_COMMIT}" >> $GITHUB_ENV
-          GO_VERSION=$(grep go_version .zuul/playbooks/containerd-build/run.yaml | grep -Eo [0-9]\.[0-9]+[^\']+)
+          GO_VERSION=$(grep GO_VERSION .github/workflows/release.yml | grep -Eo [0-9]\.[0-9]+[^\']+)
           echo "GO_VERSION=${GO_VERSION}" >> $GITHUB_ENV
           TAG_NAME="containerd-${VERSION#v}"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
