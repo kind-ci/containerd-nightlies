@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branches: ["release/1.6", "v1.6.8", "main"]
+        branches: ["release/1.6", "relase/1.7", "main"]
 
     steps:
        # this is v3.0.2 https://github.com/actions/checkout/releases/tag/v3.0.2
@@ -109,36 +109,6 @@ jobs:
           GOARCH: arm64
           CC: aarch64-linux-gnu-gcc
           CGO_ENABLED: 1
-        working-directory: src/github.com/containerd/containerd
-        run: |
-          set -x
-          make release
-          pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
-            make static BUILDTAGS="seccomp selinux apparmor"
-            mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
-          popd
-
-      - name: Build s390x
-        env:
-          GOOS: linux
-          GOARCH: s390x
-          CGO_ENABLED: 1
-          CC: s390x-linux-gnu-gcc
-        working-directory: src/github.com/containerd/containerd
-        run: |
-          set -x
-          make release
-          pushd ${{ github.workspace }}/src/github.com/opencontainers/runc
-            make static BUILDTAGS="seccomp selinux apparmor"
-            mv ./runc ${{ github.workspace }}/src/github.com/containerd/containerd/releases/runc.${GOARCH}
-          popd
-
-      - name: Build ppc64le
-        env:
-          GOOS: linux
-          GOARCH: ppc64le
-          CGO_ENABLED: 1
-          CC: powerpc64le-linux-gnu-gcc
         working-directory: src/github.com/containerd/containerd
         run: |
           set -x
