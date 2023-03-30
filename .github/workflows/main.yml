@@ -41,7 +41,7 @@ jobs:
           RUNC_COMMIT=$(cat script/setup/runc-version)
           echo "RUNC_COMMIT=${RUNC_COMMIT}" >> $GITHUB_ENV
           GO_VERSION=$(grep GO_VERSION .github/workflows/release.yml | grep -Eo [0-9]\.[0-9]+[^\']+)
-          echo "GO_VERSION=${GO_VERSION}" >> $GITHUB_ENV
+          echo "GO_VERSION='${GO_VERSION}'" >> $GITHUB_ENV
           TAG_NAME="containerd-${VERSION#v}"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
           TAG_DESCRIPTION="$tag_name Build $(date +'%d.%m.%Y %R')"
